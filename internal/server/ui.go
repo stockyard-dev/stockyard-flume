@@ -1,120 +1,29 @@
 package server
 
 var dashboardHTML = []byte(`<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stockyard Flume</title>
-<style>
-  :root {
-    --bg: #1a1410;
-    --surface: #241c15;
-    --border: #3d2e1e;
-    --rust: #c4622d;
-    --leather: #8b5e3c;
-    --cream: #f5e6c8;
-    --muted: #7a6550;
-    --text: #e8d5b0;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace, sans-serif; min-height: 100vh; }
-  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem; }
-  .logo { color: var(--rust); font-size: 1.25rem; font-weight: 700; letter-spacing: 0.05em; }
-  .badge { background: var(--rust); color: var(--cream); font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 3px; font-weight: 600; text-transform: uppercase; }
-  main { max-width: 960px; margin: 2rem auto; padding: 0 2rem; }
-  .hero { text-align: center; padding: 3rem 0 2rem; }
-  .hero h1 { font-size: 2rem; color: var(--cream); margin-bottom: 0.5rem; }
-  .hero p { color: var(--muted); font-size: 0.95rem; max-width: 480px; margin: 0 auto; }
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
-  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem; text-align: center; }
-  .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--rust); }
-  .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; margin-bottom: 1rem; }
-  .card h2 { font-size: 1rem; color: var(--cream); margin-bottom: 1rem; }
-  .tier-box { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .tier { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 1rem; }
-  .tier.pro { border-color: var(--rust); }
-  .tier-name { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.5rem; }
-  .tier.pro .tier-name { color: var(--rust); }
-  .tier-desc { font-size: 0.85rem; color: var(--text); }
-  .tier-price { font-size: 0.8rem; color: var(--leather); margin-top: 0.5rem; }
-  footer { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.75rem; }
-  footer a { color: var(--leather); text-decoration: none; }
-  .endpoint-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-  .endpoint-table th { text-align: left; color: var(--muted); padding: 0.5rem; border-bottom: 1px solid var(--border); }
-  .endpoint-table td { padding: 0.5rem; border-bottom: 1px solid var(--border); color: var(--text); }
-  .method { color: var(--rust); font-weight: 600; }
-</style>
-</head>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Stockyard Flume</title><style>:root{--bg:#1a1410;--surface:#241c15;--border:#3d2e1e;--rust:#c4622d;--cream:#f5e6c8;--muted:#7a6550;--text:#e8d5b0}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace,sans-serif}header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;gap:1rem}.logo{color:var(--rust);font-size:1.25rem;font-weight:700}.badge{background:var(--rust);color:var(--cream);font-size:0.65rem;padding:0.2rem 0.5rem;border-radius:3px;font-weight:600;text-transform:uppercase}main{max-width:1200px;margin:0 auto;padding:2rem}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}.stat{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;text-align:center}.stat-value{font-size:1.75rem;font-weight:700;color:var(--rust)}.stat-label{font-size:0.75rem;color:var(--muted);margin-top:0.25rem;text-transform:uppercase;letter-spacing:0.05em}.grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem}.card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem}.card h2{font-size:0.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1rem}.full{grid-column:1/-1}.form-row{display:flex;gap:0.5rem;margin-bottom:0.75rem;flex-wrap:wrap}select,input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem 0.75rem;border-radius:4px;font-family:inherit;font-size:0.85rem;flex:1}.btn{background:var(--rust);color:var(--cream);border:none;padding:0.5rem 1rem;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600}.btn:hover{opacity:0.85}.btn-sm{padding:0.25rem 0.6rem;font-size:0.75rem}.btn-danger{background:#7a2020}.log-table{width:100%;border-collapse:collapse;font-size:0.78rem;font-family:'JetBrains Mono',monospace}.log-table th{text-align:left;color:var(--muted);padding:0.4rem;border-bottom:1px solid var(--border);font-size:0.7rem;text-transform:uppercase}.log-table td{padding:0.35rem 0.4rem;border-bottom:1px solid rgba(61,46,30,0.5);vertical-align:top}.log-debug{color:#7a6550}.log-info{color:#e8d5b0}.log-warn{color:#f0ad4e}.log-error{color:#d9534f}.log-fatal{color:#ff4444;font-weight:700}.ts{color:var(--muted);font-size:0.7rem;white-space:nowrap}.msg{word-break:break-all}.empty{color:var(--muted);font-size:0.85rem;padding:1rem 0;text-align:center}.token-box{background:var(--bg);border:1px solid var(--border);padding:0.4rem 0.75rem;border-radius:4px;font-size:0.75rem;color:var(--muted);word-break:break-all}</style></head>
 <body>
-<header>
-  <span class="logo">⬡ Stockyard</span>
-  <span style="color:var(--muted);">/</span>
-  <span style="color:var(--cream);font-weight:600;">Flume</span>
-  <span class="badge">v0.1.0</span>
-</header>
+<header><span class="logo">&#x2B21; Stockyard</span><span style="color:var(--muted)">/</span><span style="color:var(--cream);font-weight:600">Flume</span><span class="badge">Logs</span></header>
 <main>
-  <div class="hero">
-    <h1>Flume</h1>
-    <p>Log aggregator — ship logs via HTTP, store, search, and tail them live</p>
-  </div>
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-value" id="stat-items">—</div>
-      <div class="stat-label">Total Items</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">9210</div>
-      <div class="stat-label">Port</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="stat-tier">—</div>
-      <div class="stat-label">Tier</div>
-    </div>
-  </div>
-  <div class="card">
-    <h2>Tier &amp; Limits</h2>
-    <div class="tier-box">
-      <div class="tier">
-        <div class="tier-name">Free</div>
-        <div class="tier-desc">2 sources, 50k logs retained</div>
-        <div class="tier-price">$0/mo</div>
-      </div>
-      <div class="tier pro">
-        <div class="tier-name">Pro</div>
-        <div class="tier-desc">Unlimited sources, 10M logs</div>
-        <div class="tier-price">$2.99/mo</div>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <h2>API Endpoints</h2>
-    <table class="endpoint-table">
-      <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
-      <tbody>
-        <tr><td class="method">GET</td><td>/health</td><td>Health check</td></tr>
-        <tr><td class="method">GET</td><td>/api/version</td><td>Version info</td></tr>
-        <tr><td class="method">GET</td><td>/api/limits</td><td>Current tier limits</td></tr>
-        <tr><td class="method">GET</td><td>/api/items</td><td>List items</td></tr>
-        <tr><td class="method">POST</td><td>/api/items</td><td>Create item</td></tr>
-        <tr><td class="method">GET</td><td>/api/items/{id}</td><td>Get item</td></tr>
-        <tr><td class="method">PUT</td><td>/api/items/{id}</td><td>Update item</td></tr>
-        <tr><td class="method">DELETE</td><td>/api/items/{id}</td><td>Delete item</td></tr>
-      </tbody>
-    </table>
-  </div>
+<div class="stats"><div class="stat"><div class="stat-value" id="s1">0</div><div class="stat-label">Total Logs</div></div><div class="stat"><div class="stat-value" id="s2">0</div><div class="stat-label">Streams</div></div><div class="stat"><div class="stat-value" id="s3">FREE</div><div class="stat-label">Tier</div></div></div>
+<div class="grid">
+<div class="card"><h2>New Stream</h2>
+<div class="form-row"><input id="f-sname" placeholder="Stream name"><input id="f-ret" type="number" placeholder="Retention days" value="7" style="max-width:130px"></div>
+<button class="btn btn-sm" onclick="addStream()">Create</button>
+<div id="stream-list" style="margin-top:1rem"><div class="empty">No streams</div></div></div>
+<div class="card"><h2>Search Logs</h2>
+<div class="form-row"><select id="f-sid"><option value="">All Streams</option></select><select id="f-lvl"><option value="">All Levels</option><option>debug</option><option>info</option><option>warn</option><option>error</option><option>fatal</option></select></div>
+<div class="form-row"><input id="f-search" placeholder="Search message..." oninput="loadLogs()"><input id="f-limit" type="number" placeholder="Limit" value="100" style="max-width:80px"></div>
+<button class="btn btn-sm" onclick="loadLogs()">Refresh</button></div>
+</div>
+<div class="card full"><h2>Log Viewer <span style="color:var(--muted);font-size:0.75rem">(newest first)</span></h2><div id="log-view"><div class="empty">No logs yet. Ingest via POST /api/ingest/{stream_id}</div></div></div>
 </main>
-<footer>
-  <a href="https://stockyard.dev">stockyard.dev</a> &mdash; Operations & Teams &mdash; Apache 2.0
-</footer>
 <script>
-fetch('/api/limits').then(r=>r.json()).then(d=>{
-  document.getElementById('stat-tier').textContent = d.tier.toUpperCase();
-});
-fetch('/api/items').then(r=>r.json()).then(d=>{
-  document.getElementById('stat-items').textContent = Array.isArray(d) ? d.length : '0';
-});
-</script>
-</body>
-</html>`)
+function load(){fetch('/api/stats').then(function(r){return r.json()}).then(function(d){document.getElementById('s1').textContent=d.total_logs||0})}
+function loadStreams(){fetch('/api/streams').then(function(r){return r.json()}).then(function(list){document.getElementById('s2').textContent=list.length;var sel=document.getElementById('f-sid');sel.innerHTML='<option value="">All Streams</option>';list.forEach(function(s){sel.innerHTML+='<option value="'+s.id+'">'+s.name+'</option>'});var el=document.getElementById('stream-list');el.innerHTML=list.length?list.map(function(s){return'<div style="padding:0.5rem 0;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between"><span style="color:var(--cream)">'+s.name+'</span><button class="btn btn-sm btn-danger" onclick="delStream('+s.id+')">x</button></div><div class="token-box">POST /api/ingest/'+s.id+' &nbsp;&bull;&nbsp; token: '+s.token+'</div></div>'}).join(''):'<div class="empty">No streams</div>'})}
+function loadLogs(){var sid=document.getElementById('f-sid').value;var lvl=document.getElementById('f-lvl').value;var q=document.getElementById('f-search').value;var lim=document.getElementById('f-limit').value||100;var u='/api/logs?limit='+lim+(sid?'&stream_id='+sid:'')+(lvl?'&level='+lvl:'')+(q?'&q='+encodeURIComponent(q):'')
+fetch(u).then(function(r){return r.json()}).then(function(list){var el=document.getElementById('log-view');el.innerHTML=list.length?'<table class="log-table"><thead><tr><th>Time</th><th>Stream</th><th>Level</th><th>Message</th></tr></thead><tbody>'+list.map(function(e){var cls='log-'+(e.level||'info');return'<tr><td class="ts">'+e.created_at+'</td><td style="color:var(--muted)">'+e.stream_name+'</td><td class="'+cls+'">'+e.level+'</td><td class="msg '+cls+'">'+e.message+(e.fields&&e.fields!=='{}'?'<span style="color:var(--muted)"> '+e.fields+'</span>':'')+'</td></tr>'}).join('')+"</tbody></table>":'<div class="empty">No logs match your filters</div>';load()})}
+function addStream(){var n=document.getElementById('f-sname').value.trim();var r=parseInt(document.getElementById('f-ret').value)||7;if(!n)return;fetch('/api/streams',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,retention_days:r})}).then(function(){document.getElementById('f-sname').value='';loadStreams()})}
+function delStream(id){fetch('/api/streams/'+id,{method:'DELETE'}).then(function(){loadStreams();loadLogs();load()})}
+load();loadStreams();loadLogs();setInterval(function(){loadLogs();load()},10000);
+</script></body></html>`)

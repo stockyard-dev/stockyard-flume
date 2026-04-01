@@ -1,60 +1,8 @@
 package server
-
-import (
-	"encoding/json"
-	"net/http"
-	"strconv"
-)
-
-type Item struct {
-	ID        int64  `json:"id"`
-	Name      string `json:"name"`
-	CreatedAt string `json:"created_at"`
-}
-
-func (s *Server) handleListItems(w http.ResponseWriter, r *http.Request) {
-	// List items — tool-specific query would go here
-	writeJSON(w, http.StatusOK, []Item{})
-}
-
-func (s *Server) handleCreateItem(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		Name string `json:"name"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeError(w, http.StatusBadRequest, "invalid request")
-		return
-	}
-	if req.Name == "" {
-		writeError(w, http.StatusBadRequest, "name required")
-		return
-	}
-	writeJSON(w, http.StatusCreated, map[string]string{"status": "created", "name": req.Name})
-}
-
-func (s *Server) handleGetItem(w http.ResponseWriter, r *http.Request) {
-	idStr := r.PathValue("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid id")
-		return
-	}
-	writeJSON(w, http.StatusOK, Item{ID: id})
-}
-
-func (s *Server) handleUpdateItem(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, http.StatusOK, map[string]string{"status": "updated"})
-}
-
-func (s *Server) handleDeleteItem(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, http.StatusOK, map[string]string{"status": "deleted"})
-}
-
-func (s *Server) handleUI(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html")
-	w.Write(dashboardHTML)
-}
+import("encoding/json";"net/http";"strconv";"github.com/stockyard-dev/stockyard-flume/internal/store")
+func(s *Server)handleListStreams(w http.ResponseWriter,r *http.Request){list,_:=s.db.ListStreams();if list==nil{list=[]store.Stream{}};writeJSON(w,200,list)}
+func(s *Server)handleCreateStream(w http.ResponseWriter,r *http.Request){var st store.Stream;json.NewDecoder(r.Body).Decode(&st);if st.Name==""{writeError(w,400,"name required");return};if err:=s.db.CreateStream(&st);err!=nil{writeError(w,500,err.Error());return};writeJSON(w,201,st)}
+func(s *Server)handleDeleteStream(w http.ResponseWriter,r *http.Request){id,_:=strconv.ParseInt(r.PathValue("id"),10,64);s.db.DeleteStream(id);writeJSON(w,200,map[string]string{"status":"deleted"})}
+func(s *Server)handleQueryLogs(w http.ResponseWriter,r *http.Request){sid,_:=strconv.ParseInt(r.URL.Query().Get("stream_id"),10,64);level:=r.URL.Query().Get("level");search:=r.URL.Query().Get("q");limit,_:=strconv.Atoi(r.URL.Query().Get("limit"));list,_:=s.db.QueryLogs(sid,level,search,limit);if list==nil{list=[]store.LogEntry{}};writeJSON(w,200,list)}
+func(s *Server)handleIngest(w http.ResponseWriter,r *http.Request){sid,_:=strconv.ParseInt(r.PathValue("id"),10,64);var req struct{Level string `json:"level"`;Message string `json:"message"`;Fields interface{} `json:"fields"`};json.NewDecoder(r.Body).Decode(&req);if req.Message==""{writeError(w,400,"message required");return};fields:="{}";if req.Fields!=nil{b,_:=json.Marshal(req.Fields);fields=string(b)};if err:=s.db.IngestLog(sid,req.Level,req.Message,fields);err!=nil{writeError(w,500,err.Error());return};writeJSON(w,201,map[string]string{"status":"ok"})}
+func(s *Server)handleStats(w http.ResponseWriter,r *http.Request){n,_:=s.db.CountLogs(0);writeJSON(w,200,map[string]interface{}{"total_logs":n})}
