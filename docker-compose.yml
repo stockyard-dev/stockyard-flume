@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  flume:
+    build: .
+    ports:
+      - "9210:9210"
+    environment:
+      - PORT=9210
+      - DATA_DIR=/data
+      - FLUME_LICENSE_KEY=
+    volumes:
+      - flume_data:/data
+    restart: unless-stopped
+volumes:
+  flume_data:
