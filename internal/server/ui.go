@@ -26,4 +26,5 @@ fetch(u).then(function(r){return r.json()}).then(function(list){var el=document.
 function addStream(){var n=document.getElementById('f-sname').value.trim();var r=parseInt(document.getElementById('f-ret').value)||7;if(!n)return;fetch('/api/streams',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,retention_days:r})}).then(function(){document.getElementById('f-sname').value='';loadStreams()})}
 function delStream(id){fetch('/api/streams/'+id,{method:'DELETE'}).then(function(){loadStreams();loadLogs();load()})}
 load();loadStreams();loadLogs();setInterval(function(){loadLogs();load()},10000);
+fetch('/api/tier').then(r=>r.json()).then(j=>{if(j.tier==='free'){var b=document.getElementById('upgrade-banner');if(b)b.style.display='block'}}).catch(()=>{var b=document.getElementById('upgrade-banner');if(b)b.style.display='block'});
 </script></body></html>`)
