@@ -12,7 +12,7 @@ func(s *Server)routes(){
     s.mux.HandleFunc("GET /api/logs",s.handleQueryLogs)
     s.mux.HandleFunc("POST /api/ingest/{id}",s.handleIngest)
     s.mux.HandleFunc("GET /",s.handleUI)
-s.mux.HandleFunc("GET /api/tier",func(w http.ResponseWriter,r *http.Request){wj(w,200,map[string]any{"tier":s.limits.Tier,"upgrade_url":"https://stockyard.dev/flume/"})})
+s.mux.HandleFunc("GET /api/tier",func(w http.ResponseWriter,r *http.Request){writeJSON(w,200,map[string]any{"tier":s.limits.Tier,"upgrade_url":"https://stockyard.dev/flume/"})})
 }
 func(s *Server)handleHealth(w http.ResponseWriter,r *http.Request){writeJSON(w,200,map[string]string{"status":"ok","service":"stockyard-flume"})}
 func writeJSON(w http.ResponseWriter,status int,v interface{}){w.Header().Set("Content-Type","application/json");w.WriteHeader(status);json.NewEncoder(w).Encode(v)}
