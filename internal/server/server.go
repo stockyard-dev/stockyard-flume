@@ -1,7 +1,7 @@
 package server
 import("encoding/json";"net/http";"github.com/stockyard-dev/stockyard-flume/internal/store")
 type Server struct{db *store.DB;limits Limits;mux *http.ServeMux}
-func New(db *store.DB,tier string)*Server{s:=&Server{db:db,limits:LimitsFor(tier),mux:http.NewServeMux()};s.routes();return s}
+func New(db *store.DB,limits Limits)*Server{s:=&Server{db:db,limits:limits,mux:http.NewServeMux()};s.routes();return s}
 func(s *Server)ListenAndServe(addr string)error{return(&http.Server{Addr:addr,Handler:s.mux}).ListenAndServe()}
 func(s *Server)routes(){
     s.mux.HandleFunc("GET /health",s.handleHealth)
